@@ -41,6 +41,9 @@ class Post
     #[ORM\Column]
     private ?\DateTimeImmutable $created_at = null;
 
+    #[ORM\Column(length: 400)]
+    private ?string $slug = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -153,6 +156,18 @@ class Post
 
         return $this;
     }
+    
+    public function getSlug(): ?string
+    {
+        return $this->slug;
+    }
+
+    public function setSlug(string $slug): static
+    {
+        $this->slug = $slug;
+
+        return $this;
+    }
 
     public function getAll(): ?array
     {
@@ -168,4 +183,5 @@ class Post
             'created_at' => $this->created_at
         ];
     }
+
 }

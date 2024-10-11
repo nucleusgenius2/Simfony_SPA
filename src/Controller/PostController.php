@@ -6,7 +6,6 @@ namespace App\Controller;
 use App\Entity\Post;
 use App\Repository\PostRepository;
 use Doctrine\ORM\EntityManagerInterface;
-use Knp\Component\Pager\PaginatorInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -22,14 +21,15 @@ class PostController extends AbstractController
         LoggerInterface $logger,
         PostRepository $repository,
         int $page,
+        Request $request
     ): Response
     {
         $paginator = $repository->findPaginated($page, 10);
 
-
         $postData = [];
         $status = 'success';
-        if ( count($paginator) > 0) {
+
+        if ( count($paginator) > 0 ) {
             foreach ($paginator as $post) {
                 $postData[$post->getid()] =[
                     $post->getAll()
@@ -39,29 +39,32 @@ class PostController extends AbstractController
         else{
             $status ='error';
         }
-        foreach ($paginator as $post) {
-
-            $logger->info($post->getName() );
-        }
-
+        //$logger->info('гет запрос');
+       // $logger->info(json_encode($request->query));
+        //foreach ($paginator as $post) {
+       //     $logger->info($post->getName() );
+       // }
 
         $data = [
             'status' => $status,
             'json' => $postData
         ];
 
-        return new JsonResponse($data);
+        return new JsonResponse($data, $status ==='success' ? 200 : 422 );
     }
 
-    #[Route('/api/post/{page}', name: 'post_single', methods: ['GET'])]
-    public function show(int $page, LoggerInterface $logger, PostRepository $productRepository, Request $request): Response
+    #[Route('/api/post/{slug}', name: 'post_single', methods: ['GET'])]
+    public function show(int $slug, LoggerInterface $logger, PostRepository $productRepository, Request $request): Response
     {
-        $post = $productRepository->find($page);
+        $post = $productRepository->find($slug);
+
+        $status = $post ? 'success' : 'error';
 
         $data = [
-            'status' => 'success',
-            'json' => $post->getName()
+            'status' => $status ,
+            'json' => $post->getAll()
         ];
-        return new JsonResponse($data);
+
+        return new JsonResponse($data, $status ==='success' ? 200 : 422 );
     }
 }
