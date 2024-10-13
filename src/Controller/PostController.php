@@ -21,7 +21,7 @@ class PostController extends AbstractController
         LoggerInterface $logger,
         PostRepository $repository,
         int $page,
-        Request $request
+        Request $request,
     ): Response
     {
         $paginator = $repository->findPaginated($page, 10);
