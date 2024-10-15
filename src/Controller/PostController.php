@@ -27,7 +27,6 @@ class PostController extends AbstractController
         $paginator = $repository->findPaginated($page, 10);
 
         $postData = [];
-        $status = 'success';
 
         if ( count($paginator) > 0 ) {
             foreach ($paginator as $post) {
@@ -35,15 +34,12 @@ class PostController extends AbstractController
                     $post->getAll()
                 ];
             }
+
+            $status = 'success';
         }
         else{
             $status ='error';
         }
-        //$logger->info('гет запрос');
-       // $logger->info(json_encode($request->query));
-        //foreach ($paginator as $post) {
-       //     $logger->info($post->getName() );
-       // }
 
         $data = [
             'status' => $status,

@@ -15,29 +15,6 @@ use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 use Symfony\Component\HttpFoundation\Response;
 
 class LoginController extends AbstractController {
-    /*
-    #[Route('/api/login', name: 'api_login', methods: ['POST'])]
-    public function index(
-        AuthenticationUtils $authenticationUtils,
-        #[CurrentUser] ?User $user
-    ): Response
-    {
-        if (null === $user) {
-            return $this->json([
-                 'message' => 'кароче мнебы понятто',
-            ], Response::HTTP_UNAUTHORIZED);
-        }
-
-        $token = '123'; // somehow create an API token for $user
-
-        return $this->json([
-            'message' => 'Welcome to your new controller!',
-            'path' => 'src/Controller/ApiLoginController.php',
-            'user'  => $user->getUserIdentifier(),
-            'token' => $token,
-        ]);
-   }
-    */
 
     #[Route('/api/login', name: 'api_login', methods: ['POST'])]
     public function index(
@@ -49,28 +26,24 @@ class LoginController extends AbstractController {
     ): Response
     {
         $data = $request->request->all();
-        $logger->info('---------');
-        $logger->info($data['password']);
-        $logger->info($data['email']);
 
         $user = $repository->findByUserEmail($data['email']);
 
+        //проверка пароля юзера
         if (!$passwordHasher->isPasswordValid($user, $data['password'])) {
-            $logger->info('ошибка авторизации');
-            $token = 'error';
+            $status = 'error';
         }
         else{
-            $logger->info('успех авторизации');
+            $status = 'success';
             $token = $tokenGenerator->createToken($user);
         }
 
 
         return $this->json([
-            'message' => 'Welcome to your new controller!',
-            'path' => 'src/Controller/ApiLoginController.php',
-            'user'  => $user,
-            'token' => $token,
-        ]);
+            'status' => $status,
+            'json' => $user,
+            'token' => $token ?? 'error',
+        ], $status ==='success' ? 200 : 422 );
     }
 
 

@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\User;
+use App\Service\ValidationError;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
@@ -12,6 +13,8 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class RegistrationController extends AbstractController
 {
@@ -20,45 +23,47 @@ class RegistrationController extends AbstractController
         LoggerInterface $logger,
         Request $request,
         UserPasswordHasherInterface $passwordHasher,
-        EntityManagerInterface $entityManager
+        EntityManagerInterface $entityManager,
+        ValidatorInterface $validator
     ): Response
     {
-       // $params = $request->query->get('bar');
         $data = $request->request->all();
-        $logger->info('---------');
-        $logger->info($data['name']);
-        $logger->info($data['email']);
-        $logger->info($data['password']);
 
-        // ... e.g. get the user data from a registration form
         $user = new User();
+
         $user->setName($data['name']);
         $user->setEmail($data['email']);
 
         $today = new DateTimeImmutable('now');
         $user->setCreatedAt($today);
 
-        $plaintextPassword = $data['password'];
-
-        // hash the password (based on the security.yaml config for the $user class)
+        //создание хеша пароля юзера
         $hashedPassword = $passwordHasher->hashPassword(
             $user,
-            $plaintextPassword
+            $data['password']
         );
         $user->setPassword($hashedPassword);
 
-       // $user->setPassword(password_hash($user->getPassword(), PASSWORD_BCRYPT));
+        //валидация
+        $errors = $validator->validate($user);
+        $messagesErrors = ValidationError::getMessageError($errors);
 
-        $entityManager->persist($user);
-        $entityManager->flush();
+        //валидация пройдена
+        if (!$messagesErrors) {
+            $entityManager->persist($user);
+            $entityManager->flush();
 
-        //dd($request);
+            $status = 'success';
+        }
+        else{
+            $status = 'error';
+        }
+
         $data = [
-           // 'success' => $request->getContent(),
-            'post' => $request->request->all(),
-            'get' => $request->query->all()
+            'status' => $status,
+            'errors' => $messagesErrors
         ];
 
-        return new JsonResponse($data);
+        return new JsonResponse($data, $status ==='success' ? 200 : 422 );
     }
 }
