@@ -21,21 +21,26 @@ class UserController extends AbstractController
     ): Response
     {
 
-        $page = $request->request->all();
+        $page = $request->query->get('page');
 
-        $paginator = $repository->findPaginated(1, 20);
+        if ( $page && intval($page > 0) ){
+            $paginator = $repository->findPaginated(intval($page), 20);
 
-        $userData = [];
+            $userData = [];
 
-        if (count($paginator) > 0) {
-            foreach ($paginator as $post) {
-                $userData[$post->getid()] = [
-                    $post->getAll()
-                ];
+            if (count($paginator) > 0) {
+                foreach ($paginator as $user) {
+                    $userData[$user->getid()] = [
+                        $user->getAll()
+                    ];
+                }
+
+                $status = 'success';
+            } else {
+                $status = 'error';
             }
-
-            $status = 'success';
-        } else {
+        }
+        else{
             $status = 'error';
         }
 
@@ -49,15 +54,15 @@ class UserController extends AbstractController
 
 
     #[Route('/api/user/{id}', name: 'user_single', methods: ['GET'])]
-    public function show(int $slug, LoggerInterface $logger, PostRepository $productRepository, Request $request): Response
+    public function show(int $id, PostRepository $productRepository): Response
     {
-        $post = $productRepository->find($slug);
+        $user = $productRepository->find($id);
 
-        $status = $post ? 'success' : 'error';
+        $status = $user ? 'success' : 'error';
 
         $data = [
             'status' => $status ,
-            'json' => $post->getAll()
+            'json' => $user->getAll()
         ];
 
         return new JsonResponse($data, $status ==='success' ? 200 : 422 );
