@@ -22,8 +22,8 @@ class UserController extends AbstractController
     {
 
         $page = $request->request->all();
-        dd($page);
-        $paginator = $repository->findPaginated($page, 20);
+
+        $paginator = $repository->findPaginated(1, 20);
 
         $userData = [];
 
