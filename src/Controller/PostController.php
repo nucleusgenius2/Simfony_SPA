@@ -18,7 +18,6 @@ class PostController extends AbstractController
 {
     #[Route('/api/post/{page}', name: 'post_list', methods: ['GET'], requirements: ['page' => '\d+'], defaults: ['page' => 1])]
     public function index(
-        LoggerInterface $logger,
         PostRepository $repository,
         int $page,
         Request $request,

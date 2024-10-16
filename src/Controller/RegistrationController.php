@@ -18,6 +18,7 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class RegistrationController extends AbstractController
 {
+
     #[Route('/api/registration', name: 'post_single', methods: ['POST', 'GET'])]
     public function index(
         LoggerInterface $logger,
@@ -66,4 +67,7 @@ class RegistrationController extends AbstractController
 
         return new JsonResponse($data, $status ==='success' ? 200 : 422 );
     }
+
+
+
 }

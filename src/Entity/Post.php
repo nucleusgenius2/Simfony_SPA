@@ -5,8 +5,11 @@ namespace App\Entity;
 use App\Repository\PostRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 #[ORM\Entity(repositoryClass: PostRepository::class)]
+
+#[UniqueEntity(fields: ['slug'])]
 class Post
 {
     #[ORM\Id]
@@ -41,7 +44,7 @@ class Post
     #[ORM\Column]
     private ?\DateTimeImmutable $created_at = null;
 
-    #[ORM\Column(length: 400)]
+    #[ORM\Column(name: 'slug', type: 'string', length: 255, unique: true)]
     private ?string $slug = null;
 
     public function getId(): ?int

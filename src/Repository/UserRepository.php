@@ -4,6 +4,7 @@ namespace App\Repository;
 
 use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -23,5 +24,16 @@ class UserRepository extends ServiceEntityRepository
             ->setParameter('email', $email)
             ->getQuery()
             ->getOneOrNullResult();
+    }
+
+    public function findPaginated(int $currentPage = 1, int $limit = 10)
+    {
+        $query = $this->createQueryBuilder('user')
+            ->orderBy('user.id', 'ASC')
+            ->getQuery()
+            ->setFirstResult(($currentPage - 1) * $limit)
+            ->setMaxResults($limit);
+
+        return new Paginator($query, true);
     }
 }
