@@ -16,7 +16,7 @@ use Symfony\Component\Routing\Attribute\Route;
 
 class PostController extends AbstractController
 {
-    #[Route('/api/post/{page}', name: 'post_list', methods: ['GET'], requirements: ['page' => '\d+'], defaults: ['page' => 1])]
+    #[Route('/api/posts/{page}', name: 'post_list', methods: ['GET'], requirements: ['page' => '\d+'], defaults: ['page' => 1])]
     public function index(
         PostRepository $repository,
         int $page,
@@ -29,9 +29,7 @@ class PostController extends AbstractController
 
         if ( count($paginator) > 0 ) {
             foreach ($paginator as $post) {
-                $postData[$post->getid()] =[
-                    $post->getAll()
-                ];
+                $postData[$post->getid()] = $post->getAll();
             }
 
             $status = 'success';
@@ -48,7 +46,7 @@ class PostController extends AbstractController
         return new JsonResponse($data, $status ==='success' ? 200 : 422 );
     }
 
-    #[Route('/api/post/{slug}', name: 'post_single', methods: ['GET'])]
+    #[Route('/api/posts/{slug}', name: 'post_single', methods: ['GET'])]
     public function show(int $slug, LoggerInterface $logger, PostRepository $productRepository, Request $request): Response
     {
         $post = $productRepository->find($slug);
