@@ -43,7 +43,7 @@ let arrayPostEl = ref([]);
 let arrayPagination = ref([]);
 
 async function getPostsList (page){
-        let response = await authRequest('/api/posts?page='+page, 'get' );
+        let response = await authRequest('api/posts?page='+page, 'get' );
 
         if ( response.data.status === 'success' ){
             let arrayPost = response.data.json.data;
@@ -86,7 +86,7 @@ getPostsList(1);
 async function removePost(e){
     let id = e.target.getAttribute('data-id');
 
-    let response = await authRequest('/api/posts/'+id, 'delete');
+    let response = await authRequest('api/posts/'+id, 'delete');
 
     if ( response.data.status==='success' ){
         e.target.closest('.post-el').remove();

@@ -56,7 +56,7 @@ let imgPreview = ref('');
 onMounted(
     async () => {
         if (route.params.id !== 'add') {
-            let response = await authRequest('/api/users/' + route.params.id, 'get');
+            let response = await authRequest('api/users/' + route.params.id, 'get');
 
             if ( response.data.status === 'success' ){
                 user.value = response.data.json[0];
@@ -87,7 +87,7 @@ async function save(){
     formData.append('id_category', '');
     //create post
     if ( route.params.id === 'add' ){
-        let response = await authRequest('/api/posts', 'post', formData);
+        let response = await authRequest('api/posts', 'post', formData);
 
         if (response.data.status === 'success'){
             saveStatus.value = response.data.status;
@@ -97,7 +97,7 @@ async function save(){
     //update post
     else {
         formData.append('_method',"PATCH") //фикс бага ларавел(форм дата не работает в пут и патч), отправляем пост, но с методом PATCH, чтобы вызвался роут патч
-        let response = await authRequest('/api/posts', 'post', formData );
+        let response = await authRequest('api/posts', 'post', formData );
         saveStatus.value = response.data.status;
     }
 

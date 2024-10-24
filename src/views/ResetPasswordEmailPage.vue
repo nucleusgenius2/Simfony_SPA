@@ -48,7 +48,7 @@ if (localStorage.getItem("token") !== null) {
 
 async function formSubmit(){
 console.log('23')
-    let response = await notAuthRequest('/api/reset_password', 'post', {
+    let response = await notAuthRequest('api/reset_password', 'post', {
         'email' : email.value
     });
     if (response.data.status === 'success') {

@@ -92,7 +92,7 @@ let newPasswordValidate = ref('');
 
 onMounted(
     async () => {
-        let responsive = await authRequest('/api/profile', 'get');
+        let responsive = await authRequest('api/profile', 'get');
         data.value = responsive.data;
     }
 );
@@ -116,7 +116,7 @@ async function updateProfile() {
             newPassword: newPasswordValidate.value,
         }
 
-        let response = await authRequest('/api/profile', 'patch',  dataReq);
+        let response = await authRequest('api/profile', 'patch',  dataReq);
 
         if (response.data.status === 'success') {
             success.value = 'Данные обновлены';

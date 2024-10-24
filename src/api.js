@@ -1,8 +1,8 @@
 import axios from "axios";
 
-export async function authRequest (url ='', type='get', data={}){
+export async function authRequest (path ='', type='get', data={}){
 
-    url = process.env.VUE_DOMAIN_BACKEND+'/'+url;
+    let url = process.env.VUE_APP_DOMAIN_BACKEND+'/'+path;
     let token = '';
     let response = 'error';
     if (localStorage.getItem("token") !== null ) {
@@ -10,9 +10,7 @@ export async function authRequest (url ='', type='get', data={}){
     }
 
     let headers = {
-        accept: 'application/json',
-       // 'Content-Type' : "multipart/form-data; charset=utf-8; boundary=" + Math.random().toString().substr(2),
-        Authorization: 'Bearer ' + token.token
+        Authorization: 'Bearer ' + token
     }
 
     if (type === 'get') {
@@ -28,7 +26,10 @@ export async function authRequest (url ='', type='get', data={}){
     if (type === 'post' ) {
         try {
             response = await axios.post(url, data, {
-                headers: headers
+                headers: {
+                    'Content-Type' : "multipart/form-data; charset=utf-8;",
+                    Authorization: 'Bearer ' + token
+                }
             });
         } catch (error) {
             response = error.response;
@@ -55,7 +56,7 @@ export async function authRequest (url ='', type='get', data={}){
         }
     }
 
-    if (typeof response.data.text === 'object'){
+    if (response && typeof response.data.text === 'object'){
         let string = '';
 
         for (let i in response.data.text) {
@@ -69,20 +70,34 @@ export async function authRequest (url ='', type='get', data={}){
 
 }
 
-export async function notAuthRequest (url ='', type='post', data={} ){
+export async function notAuthRequest (path ='', type='post', data={} ){
+    let headers = {
+        'Content-Type' : "multipart/form-data; charset=utf-8; boundary=" + Math.random().toString().substr(2),
+    }
 
-    url = process.env.VUE_DOMAIN_BACKEND+'/'+url;
+    let url = process.env.VUE_APP_DOMAIN_BACKEND+'/'+path;
     let response = 'error';
 
-    if ( type === 'post' ) {
+    if (type === 'get') {
         try {
-            response = await axios.post(url, data);
+            response = await axios.get(url);
         } catch (error) {
             response = error.response;
         }
     }
 
-    if (typeof response.data.text === 'object'){
+    if ( type === 'post' ) {
+        try {
+            response = await axios.post(url, data, {
+                headers: headers
+            });
+        } catch (error) {
+            response = error.response;
+        }
+    }
+
+
+    if (response && typeof response.data.text === 'object'){
         let string = '';
 
         for (let i in response.data.text) {

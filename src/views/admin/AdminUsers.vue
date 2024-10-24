@@ -44,7 +44,7 @@ let arrayPostEl = ref([]);
 let arrayPagination = ref([]);
 
 async function getPostsList (page){
-    let response = await authRequest('/api/users?page='+page, 'get' );
+    let response = await authRequest('api/users?page='+page, 'get' );
 
     if ( response.data.status === 'success' ){
         let arrayPost = response.data.json.data;

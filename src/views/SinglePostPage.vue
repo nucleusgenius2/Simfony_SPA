@@ -25,7 +25,7 @@ let post = ref([]);
 
 onMounted(
     async () => {
-       let response = await authRequest('/api/posts/'+route.params.id, 'get' );
+       let response = await authRequest('api/posts/'+route.params.id, 'get' );
        if ( response.data.status === 'success' ){
            post.value = response.data.json[0];
        }

@@ -60,11 +60,13 @@ async function formSubmit(){
         password: password.value,
     }
 
-    let response = await notAuthRequest('/api/login', 'post', data);
+    let response = await notAuthRequest('api/login', 'post', data);
+    console.log(response)
+  console.log(response.data.token)
     if (response.data.status === 'success') {
         status.value = 'auth';
         error.value ='';
-        localStorage.setItem('token', JSON.stringify(response.data.json))
+        localStorage.setItem('token', JSON.stringify(response.data.token))
     }
     else {
         error.value = response.data.text;

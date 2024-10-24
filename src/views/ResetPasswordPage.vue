@@ -60,7 +60,7 @@ async function formSubmit(){
         '_method': "PATCH"
     }
 
-    let response = await notAuthRequest('/api/reset_password', 'post', data);
+    let response = await notAuthRequest('api/reset_password', 'post', data);
     if (response.data.status === 'success') {
         status.value = true;
         error.value ='';

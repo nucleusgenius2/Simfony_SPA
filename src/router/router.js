@@ -1,8 +1,9 @@
 import { createRouter, createWebHistory } from "vue-router";
 import {authRequest} from "@/api.js";
 
+console.log(process.env.VUE_APP_DOMAIN_FRONTEND)
 const router = createRouter({
-    history: createWebHistory(process.env.VUE_DOMAIN_FRONTEND),
+    history: createWebHistory(),
     routes: [
         {
             path: "/",
@@ -123,7 +124,7 @@ router.beforeEach( async (to, from, next) => {
     if ( to.name === 'admin' || to.name === 'Profile' ) {
         if ( localStorage.getItem("token") !== null ) {
 
-            let response = await authRequest('/api/authorization', 'get');
+            let response = await authRequest('api/authorization', 'get');
 
             if (to.name === 'admin') {
                 if (response.data.permission === 'admin') {

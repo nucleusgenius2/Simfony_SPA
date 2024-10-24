@@ -48,7 +48,7 @@
                     </div>
                 </form>
 
-                <div class="auth-text form-auth-true"  v-if="status === 'auth'">Вы зарегистрированы</div>
+                <div class="auth-text form-auth-true"  v-if="status === 'auth'">Вы зарегистрированы. Войдите под своим логином и паролем.</div>
                 <div class="auth-text form-auth-false"  v-if="error !== ''">{{ error }}</div>
 
             </div>
@@ -87,16 +87,15 @@ async function formSubmit(){
         password_confirmation: passwordConfirm.value,
     }
 
-    let response = await notAuthRequest('/api/registration', 'post', data);
+    let response = await notAuthRequest('api/registration', 'post', data);
 
     if (response.data.status === 'success') {
         status.value = 'auth';
         error.value ='';
-        localStorage.setItem('token', JSON.stringify(response.data.json))
     }
     else {
         status.value ='noAuth';
-        error.value = response.data.text;
+        error.value = response.data.errors;
     }
 
 }

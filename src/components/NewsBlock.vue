@@ -1,7 +1,6 @@
 <template>
     <div class="wrap-news">
         <div class="news-list">
-
             <div class="post-el" v-for="(post) in arrayPostEl" :key="post.id">
                 <div class="heading-post">{{ post.name }}</div>
                 <div class="wrap-section-post">
@@ -32,7 +31,7 @@
 <script setup>
 import {onMounted, ref} from 'vue';
 import {useRoute} from "vue-router";
-import {authRequest} from "@/api.js";
+import { notAuthRequest} from "@/api.js";
 import { defineProps} from 'vue'
 let props = defineProps({
     total: String,
@@ -54,18 +53,17 @@ onMounted(
             page = props.page;
         }
 
-        let response = await authRequest('/api/posts?page='+page, 'get' );
+        let response = await notAuthRequest('api/posts?page='+page, 'get' );
 
         if ( response.data.status === 'success' ){
 
-            let arrayPost = response.data.json.data;
+          let arrayPost = response.data.json;
             //total post for page
             if (typeof props.total !=='undefined'){
                 if ( arrayPost.length >props.total ){
                     arrayPost.splice(props.total);
                 }
             }
-            let arrayLink = response.data.json.links;
 
             //short description post
             for (let i = 0; i < arrayPost.length; i++) {
@@ -73,27 +71,9 @@ onMounted(
                     arrayPost[i]['short_description'] = arrayPost[i]['short_description'].slice(0, 80) + '...';
                 }
             }
+          arrayPostEl.value = arrayPost
 
-            //pagination array localization
-            arrayLink[0]['label'] = 'В начало';
-            arrayLink[arrayLink.length - 1]['label'] = 'В конец';
 
-            for (let i = 0; i < arrayLink.length; i++) {
-                let page = i;
-                //first link pagination
-                if (page === 0) {
-                    page = 1;
-                }
-                //last link pagination
-                else if (page === arrayLink.length - 1) {
-                    page = arrayLink.length - 2;
-                }
-
-                arrayLink[i]['url'] = '/post-list/' + page;
-            }
-
-            arrayPagination.value = arrayLink;
-            arrayPostEl.value = arrayPost;
         }
         else {
             emptyPage.value = true;

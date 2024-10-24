@@ -45,7 +45,7 @@ onMounted(async () => {
     if (localStorage.getItem("token") !== null) {
 
         //set token in axios header
-        let response = await authRequest('/api/authorization', 'get');
+        let response = await authRequest('api/authorization', 'get');
 
         auth.value = response.data;
         userEmail.value = JSON.parse(localStorage.getItem('token')).user
@@ -55,7 +55,7 @@ onMounted(async () => {
 
 //logout
 async function logout() {
-    let response = await authRequest('/api/logout/', 'get');
+    let response = await authRequest('api/logout/', 'get');
     if (response.data.status === 'success') {
         auth.value.status = '';
         localStorage.removeItem('token');

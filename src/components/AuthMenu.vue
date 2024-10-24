@@ -38,20 +38,20 @@ onMounted(async () => {
 async function authorization(){
     //check local store
     if (localStorage.getItem("token") !== null ) {
-        let response = await authRequest('/api/authorization', 'get');
+        let response = await authRequest('api/authorization', 'get');
         if ( response.data.status === 'success' ){
             auth.value = response.data;
             userEmail.value = JSON.parse(localStorage.getItem('token')).user;
         }
         else {
-            localStorage.removeItem('token');
+           // localStorage.removeItem('token');
         }
     }
 }
 
 //logout
 async function logout() {
-    let response = await authRequest('/api/logout/', 'get');
+    let response = await authRequest('api/logout/', 'get');
     if (response.data.status === 'success') {
         auth.value.status = '';
         localStorage.removeItem('token');
