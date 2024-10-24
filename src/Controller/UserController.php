@@ -4,7 +4,9 @@ namespace App\Controller;
 
 use App\Repository\PostRepository;
 use App\Repository\UserRepository;
+use App\Traits\ResponseController;
 use Doctrine\ORM\EntityManagerInterface;
+use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -14,6 +16,8 @@ use Symfony\Component\Routing\Attribute\Route;
 
 class UserController extends AbstractController
 {
+    use ResponseController;
+
     #[Route('/api/user', name: 'user_list', methods: ['GET'])]
     public function index(
         UserRepository $repository,
@@ -68,6 +72,21 @@ class UserController extends AbstractController
         return new JsonResponse($data, $status ==='success' ? 200 : 422 );
     }
 
+    #[Route('/api/authorization', name: 'check_auth', methods: ['GET'])]
+    public function checkStatusUser()
+    {
+       $user = $this->getUser();
+
+        $data = [
+            'status' => 'success',
+            'json' => [
+                'role' =>$user->getRoles()
+            ]
+
+        ];
+        return new JsonResponse($data, 202);
+    }
+
     /*
 public function isAdminPermission(User $user): bool
 {
@@ -78,19 +97,6 @@ public function isAdminPermission(User $user): bool
     }
 }
 
-
-public function checkStatusUser(Request $request): JsonResponse
-{
-    $user = request()->user();
-
-    if ($user->tokenCan('permission:admin')) {
-        $data = ['status' => 'success', 'permission' => 'admin'];
-    } else {
-        $data = ['status' => 'success', 'permission' => 'user'];
-    }
-
-    return response()->json($data, 200);
-}
 
 
 

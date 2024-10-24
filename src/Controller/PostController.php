@@ -5,6 +5,7 @@ namespace App\Controller;
 
 use App\Entity\Post;
 use App\Repository\PostRepository;
+use App\Traits\ResponseController;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -16,6 +17,8 @@ use Symfony\Component\Routing\Attribute\Route;
 
 class PostController extends AbstractController
 {
+    use ResponseController;
+
     #[Route('/api/posts/{page}', name: 'post_list', methods: ['GET'], requirements: ['page' => '\d+'], defaults: ['page' => 1])]
     public function index(
         PostRepository $repository,
@@ -32,18 +35,16 @@ class PostController extends AbstractController
                 $postData[$post->getid()] = $post->getAll();
             }
 
-            $status = 'success';
-        }
-        else{
-            $status ='error';
+            $this->status = 'success';
+            $this->code = 200;
         }
 
         $data = [
-            'status' => $status,
+            'status' => $this->status,
             'json' => $postData
         ];
 
-        return new JsonResponse($data, $status ==='success' ? 200 : 422 );
+        return new JsonResponse($data, $this->code);
     }
 
     #[Route('/api/posts/{slug}', name: 'post_single', methods: ['GET'])]
@@ -51,13 +52,16 @@ class PostController extends AbstractController
     {
         $post = $productRepository->find($slug);
 
-        $status = $post ? 'success' : 'error';
+        if($post) {
+            $this->status = 'success';
+            $this->code = 200;
+        }
 
         $data = [
-            'status' => $status ,
+            'status' => $this->status ,
             'json' => $post->getAll()
         ];
 
-        return new JsonResponse($data, $status ==='success' ? 200 : 422 );
+        return new JsonResponse($data, $this->code);
     }
 }
