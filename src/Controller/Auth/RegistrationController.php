@@ -21,7 +21,7 @@ class RegistrationController extends AbstractController
 {
     use ResponseController;
 
-    #[Route('/api/registration', name: 'post_single', methods: ['POST', 'GET'])]
+    #[Route('/api/registration', name: 'api_registration', methods: ['POST'])]
     public function index(
         LoggerInterface $logger,
         Request $request,
@@ -40,6 +40,7 @@ class RegistrationController extends AbstractController
 
             $user->setName($data['name']);
             $user->setEmail($data['email']);
+            $user->setRoles('ROLE_USER');
 
             $today = new DateTimeImmutable('now');
             $user->setCreatedAt($today);
@@ -53,10 +54,10 @@ class RegistrationController extends AbstractController
 
             //валидация
             $errors = $validator->validate($user);
-            $messagesErrors = ValidationError::getMessageError($errors);
+            $this->messagesErrors = ValidationError::getMessageError($errors);
 
             //валидация пройдена
-            if (!$messagesErrors) {
+            if (!$this->messagesErrors) {
                 $entityManager->persist($user);
                 $entityManager->flush();
 

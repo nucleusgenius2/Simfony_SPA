@@ -12,7 +12,8 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\Table(name: '`user`')]
 
-#[UniqueEntity(fields: ['name', 'email'])]
+#[UniqueEntity(fields: ['name'], message: 'Имя уже занято')]
+#[UniqueEntity(fields: ['email'], message: 'Email уже занят')]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
@@ -24,8 +25,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[Assert\Length(
         min: 5,
         max: 50,
-        minMessage: 'Минимальное количество знаков {{ limit }}',
-        maxMessage: 'Максимальное количество знаков {{ limit }}',
+        minMessage: 'Минимальное количество знаков в поле Имя {{ limit }}',
+        maxMessage: 'Максимальное количество знаков в поле Имя {{ limit }}',
     )]
     private ?string $name = null;
 
@@ -36,8 +37,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[Assert\Length(
         min: 5,
         max: 255,
-        minMessage: 'Минимальное количество знаков {{ limit }}',
-        maxMessage: 'Максимальное количество знаков {{ limit }}',
+        minMessage: 'Минимальное количество знаков в поле Email {{ limit }}',
+        maxMessage: 'Максимальное количество знаков в поле Email {{ limit }}',
     )]
     private ?string $email = null;
 
@@ -133,19 +134,26 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     public function getRoles(): array
     {
-        $roles = $this->roles;
+        //$roles = $this->roles;
         // guarantee every user at least has ROLE_USER
-        $roles[] = 'ROLE_USER';
+        $roles[] = $this->roles;
 
         return array_unique($roles);
     }
 
-    public function setRoles(array $roles): self
+
+    public function setRoles(string $roles): self
     {
         $this->roles = $roles;
 
         return $this;
     }
+
+    public function getRolesStr(): string
+    {
+        return $this->roles;
+    }
+
 
 
     /**
@@ -157,7 +165,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         // $this->plainPassword = null;
     }
 
-    public function getAll(): ?array
+    public function getPublicData(): ?array
     {
         return [
             'name' => $this->name,

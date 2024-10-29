@@ -6,8 +6,6 @@ use App\Repository\PostRepository;
 use App\Repository\UserRepository;
 use App\Traits\ResponseController;
 use Doctrine\ORM\EntityManagerInterface;
-use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
-use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -22,6 +20,7 @@ class UserController extends AbstractController
     public function index(
         UserRepository $repository,
         Request $request,
+        EntityManagerInterface $entityManager,
     ): Response
     {
 
@@ -35,7 +34,7 @@ class UserController extends AbstractController
             if (count($paginator) > 0) {
                 foreach ($paginator as $user) {
                     $userData[$user->getid()] = [
-                        $user->getAll()
+                        $user->getPublicData()
                     ];
                 }
 
@@ -58,15 +57,15 @@ class UserController extends AbstractController
 
 
     #[Route('/api/user/{id}', name: 'user_single', methods: ['GET'])]
-    public function show(int $id, PostRepository $productRepository): Response
+    public function show(int $id, userRepository $userRepository): Response
     {
-        $user = $productRepository->find($id);
+        $user = $userRepository->find($id);
 
         $status = $user ? 'success' : 'error';
 
         $data = [
             'status' => $status ,
-            'json' => $user->getAll()
+            'json' => $user->getPublicData()
         ];
 
         return new JsonResponse($data, $status ==='success' ? 200 : 422 );
@@ -75,12 +74,12 @@ class UserController extends AbstractController
     #[Route('/api/authorization', name: 'check_auth', methods: ['GET'])]
     public function checkStatusUser()
     {
-       $user = $this->getUser();
+        $user = $this->getUser();
 
         $data = [
             'status' => 'success',
             'json' => [
-                'role' =>$user->getRoles()
+                'role' =>$user->getRolesStr()
             ]
 
         ];

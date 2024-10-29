@@ -7,7 +7,7 @@ namespace App\Traits;
 trait ResponseController
 {
 
-    public int $code = 404;
+    public int $code = 422;
 
     public string $status = 'error';
 
