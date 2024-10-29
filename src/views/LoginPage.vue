@@ -69,7 +69,7 @@ async function formSubmit(){
         localStorage.setItem('token', JSON.stringify(response.data.token))
     }
     else {
-        error.value = response.data.text;
+        error.value = response.data.errors;
     }
 
 }

@@ -44,22 +44,17 @@ async function authorization(){
             userEmail.value = JSON.parse(localStorage.getItem('token')).user;
         }
         else {
-           // localStorage.removeItem('token');
+            localStorage.removeItem('token');
         }
     }
 }
 
 //logout
 async function logout() {
-    let response = await authRequest('api/logout/', 'get');
-    if (response.data.status === 'success') {
-        auth.value.status = '';
-        localStorage.removeItem('token');
-        window.location.replace("/login");
-    }
-    else {
-        console.error(response.status);
-    }
+  auth.value.status = '';
+  localStorage.removeItem('token');
+  window.location.replace("/login");
+
 }
 </script>
 

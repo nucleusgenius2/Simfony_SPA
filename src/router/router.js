@@ -71,7 +71,7 @@ const router = createRouter({
         },
         {
             path: "/admin",
-            name: "admin",
+            name: "Admin",
             component: () => import("@/views/admin/AdminIndex.vue"),
             children: [
                 {
@@ -121,13 +121,12 @@ const router = createRouter({
 
 // protect router
 router.beforeEach( async (to, from, next) => {
-    if ( to.name === 'admin' || to.name === 'Profile' ) {
+    if ( to.name === 'Admin' || to.name === 'Profile' ) {
         if ( localStorage.getItem("token") !== null ) {
 
             let response = await authRequest('api/authorization', 'get');
-
-            if (to.name === 'admin') {
-                if (response.data.permission === 'admin') {
+            if (to.name === 'Admin') {
+                if (response.data.json.role === 'admin') {
                     next()
                 } else {
                     next({name: 'Login'})
@@ -135,7 +134,7 @@ router.beforeEach( async (to, from, next) => {
             }
 
             if (to.name === 'Profile') {
-                if (response.data.permission === 'user' || response.data.permission === 'admin') {
+                if (response.data.json.role === 'ROLE_USER' || response.data.json.role === 'admin') {
                     next()
                 } else {
                     next({name: 'Login'})

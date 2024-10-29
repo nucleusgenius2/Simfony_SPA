@@ -49,7 +49,13 @@
                 </form>
 
                 <div class="auth-text form-auth-true"  v-if="status === 'auth'">Вы зарегистрированы. Войдите под своим логином и паролем.</div>
-                <div class="auth-text form-auth-false"  v-if="error !== ''">{{ error }}</div>
+                <div class="auth-text form-auth-false"  v-if="error !== ''">
+                  <span v-if="Array.isArray(error)">
+                        <span v-for="(el, key) in error" :key="key"> {{ el.message }}</span>
+                  </span>
+                  <span v-else> {{ error }}</span>
+
+                </div>
 
             </div>
 

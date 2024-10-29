@@ -39,32 +39,14 @@
                     </div>
 
                     <div class="wrap-error" v-if="error !==''">
-                        {{ error }}
+                        <span v-if="Array.isArray(error)">
+                          <span v-for="(el, key) in error" :key="key"> {{ el.message }}</span>
+                       </span>
+                        <span v-else> {{ error }}</span>
                     </div>
 
                     <div class="wrap-success" v-if="success !==''">
                         {{ success }}
-                    </div>
-
-                </div>
-                <div class="wrap-balance" v-if="typeof (data.name) !=='undefined' ">
-
-                    <div class="balance" v-if="data.data_balance.length > 0">
-                        <span>Ваш баланс: </span><span>{{ data.data_balance[0].user_balance.balance }}</span>
-                    </div>
-
-                    <div class="balance" v-if="data.data_balance.length === 0">
-                        <span>Ваш баланс: </span><span> 0 </span>
-                    </div>
-
-                    <div class="last-operation">
-                        <div>Последние 5 операций: </div>
-                        <div class="operation" v-for="(value) in data.data_balance" :key="value.id">
-                            <div class="name-operation">{{ value['name'] }}</div>
-                            <div class="summa-operation plus" v-if="value['type']==='plus'">+ {{ value['balance'] }}</div>
-                            <div class="summa-operation minus" v-if="value['type']==='minus'">- {{ value['balance'] }}</div>
-                            <div class="date-operation">{{ new Date(  value['created_at'] ).toLocaleString() }}</div>
-                        </div>
                     </div>
 
                 </div>
@@ -93,14 +75,16 @@ let newPasswordValidate = ref('');
 onMounted(
     async () => {
         let responsive = await authRequest('api/profile', 'get');
-        data.value = responsive.data;
+        if (responsive.data.status === 'success') {
+          data.value = responsive.data.json;
+        }
     }
 );
 
 
 async function updateProfile() {
 
-    if (data.value.name !== '' && data.value.name !== '' && password.value !== '') {
+    if (data.value.name !== '' && data.value.name !== '') {
 
         //auth
         if (newPassword.value === '') {
@@ -116,13 +100,13 @@ async function updateProfile() {
             newPassword: newPasswordValidate.value,
         }
 
-        let response = await authRequest('api/profile', 'patch',  dataReq);
+        let response = await authRequest('api/profile', 'put',  dataReq);
 
-        if (response.data.status === 'success') {
+        if (response && response.data.status === 'success') {
             success.value = 'Данные обновлены';
             error.value = '';
         } else {
-            error.value = 'Форма заполнена с ошибками';
+            error.value = response.data.errors;
             success.value = '';
         }
 

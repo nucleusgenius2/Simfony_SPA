@@ -36,10 +36,15 @@ export async function authRequest (path ='', type='get', data={}){
         }
     }
 
-    if (type === 'patch') {
+    if (type === 'put') {
         try {
-            response = await axios.patch(url, data, {
-                headers: headers
+            response = await axios.put(url, data, {
+                headers: {
+                    'Cache-Control': null,
+                    'X-Requested-With': null,
+                    'Content-Type' : "application/json",
+                    Authorization: 'Bearer ' + token
+                }
             });
         } catch (error) {
             response = error.response;
@@ -54,6 +59,11 @@ export async function authRequest (path ='', type='get', data={}){
         } catch (error) {
             response = error.response;
         }
+    }
+
+    //токен просрочен
+    if (response && response.data.code === 401){
+        localStorage.removeItem('token');
     }
 
     if (response && typeof response.data.text === 'object'){
