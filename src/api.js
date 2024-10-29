@@ -62,6 +62,7 @@ export async function authRequest (path ='', type='get', data={}){
     }
 
     //токен просрочен
+    console.log( response.data)
     if (response && response.data.code === 401){
         localStorage.removeItem('token');
     }

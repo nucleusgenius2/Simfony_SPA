@@ -13,13 +13,16 @@
             </div>
 
             <div class="wrap-field">
-                <div class="heading-field">Дата регистрации</div>
-                <span>{{ user.created_at }} </span>
+              <div class="heading-field">Роль</div>
+              <select class="field-admin" v-model="user.role">
+                <option value="ROLE_USER">Пользователь</option>
+                <option value="ROLE_ADMIN">Админ</option>
+              </select>
             </div>
 
             <div class="wrap-field">
-                <div class="heading-field">Краткое описание новости</div>
-                <textarea class='field-admin textarea-field' v-model="user.short_description"></textarea>
+                <div class="heading-field">Дата регистрации</div>
+                <span>{{ renderDate(user.created_at) }} </span>
             </div>
 
             <div class="wrap-save">
@@ -45,11 +48,10 @@ import {authRequest} from "@/api.js";
 const route = useRoute();
 let user = ref({
     name : '',
-    img : '',
+    role : '',
 });
 let textEditor = ref('');
 let saveStatus = ref('');
-let imgPreview = ref('');
 
 
 //get post info
@@ -59,10 +61,8 @@ onMounted(
             let response = await authRequest('api/users/' + route.params.id, 'get');
 
             if ( response.data.status === 'success' ){
-                user.value = response.data.json[0];
-                user.value.created_at = new Date(user.value.created_at).toLocaleString();
-                textEditor.value = response.data.json[0].content;
-                imgPreview.value = response.data.json[0].img;
+                user.value = response.data.json;
+                textEditor.value = response.data.json.content;
             }
             else {
                 return router.put({ name: '404',  query: { textError: encodeURIComponent(response.data.text) } })
@@ -110,6 +110,11 @@ async function save(){
         console.log(saveStatus.value);
     }
 
+}
+
+function renderDate(date){
+  console.log(date)
+  if( date ) {return new Date((date['date']).toLocaleString())}
 }
 
 

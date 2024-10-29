@@ -6,21 +6,17 @@
             <div class="post-heading-block table-users">
                 <div class="post-name">Ник</div>
                 <div class="user-email">Email</div>
-                <div class="user-ip">Последний ip</div>
                 <div class="user-status">Статус</div>
                 <div class="wrap-date">Дата регистрации</div>
-                <div class="wrap-rate">Рейтинг</div>
-                <div class="wrap-icons">Иконки</div>
             </div>
 
-            <div class="post-el table-users" v-for="(user) in arrayPostEl" :key="user.id">
+            <div v-for="(users) in usersData" :key="users.id">
+                <div class="post-el table-users" v-for="(user) in users" :key="user.id">
                 <div><a :href="'/admin/users/'+user.id" class="post-name">{{ user.name }}</a></div>
                 <div class="user-email">{{ user.email }}</div>
-                <div class="user-ip">сделать вывод</div>
                 <div class="user-status">{{ user.status }}</div>
-                <div class="wrap-date">{{ user.created_at  }}</div>
-                <div class="wrap-rate">сделать вывод</div>
-                <div class="wrap-icons">сделать вывод</div>
+                <div class="wrap-date" >{{ renderDate(user.created_at) }}</div>
+               </div>
             </div>
 
             <div class="pagination-post">
@@ -40,48 +36,21 @@ import {ref} from 'vue';
 import {authRequest} from "@/api.js";
 
 
-let arrayPostEl = ref([]);
+let usersData = ref([]);
 let arrayPagination = ref([]);
 
 async function getPostsList (page){
     let response = await authRequest('api/users?page='+page, 'get' );
 
     if ( response.data.status === 'success' ){
-        let arrayPost = response.data.json.data;
-        let arrayLink = response.data.json.links;
-
-        //short description post
-        for (let i = 0; i < arrayPost.length; i++) {
-            //converting date
-            arrayPost[i]['created_at'] = new Date(arrayPost[i]['created_at']).toLocaleString();
-            arrayPost[i]['updated_at'] = new Date(arrayPost[i]['updated_at']).toLocaleString();
-        }
-
-        //pagination array localization
-        arrayLink[0]['label'] = 'В начало';
-        arrayLink[arrayLink.length - 1]['label'] = 'В конец';
-
-        for (let i = 0; i < arrayLink.length; i++) {
-            let page = i;
-            //first link pagination
-            if (page === 0) {
-                page = 1;
-            }
-            //last link pagination
-            else if (page === arrayLink.length - 1) {
-                page = arrayLink.length - 2;
-            }
-
-            arrayLink[i]['url'] = page;
-        }
-
-        arrayPagination.value = arrayLink;
-        arrayPostEl.value = arrayPost;
+       usersData.value = response.data.json;
     }
-
 }
 getPostsList(1);
 
+function renderDate(date){
+  return new Date((date['date']).toLocaleString())
+}
 
 </script>
 
@@ -119,7 +88,7 @@ getPostsList(1);
 }
 
 .table-users > div  {
-    flex-basis: 16%;
+    flex-basis: 25%;
 }
 
 

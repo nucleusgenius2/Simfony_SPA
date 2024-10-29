@@ -41,7 +41,7 @@
                     <div class="wrap-error" v-if="error !==''">
                         <span v-if="Array.isArray(error)">
                           <span v-for="(el, key) in error" :key="key"> {{ el.message }}</span>
-                       </span>
+                        </span>
                         <span v-else> {{ error }}</span>
                     </div>
 
