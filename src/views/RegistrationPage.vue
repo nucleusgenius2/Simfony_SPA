@@ -54,7 +54,6 @@
                         <span v-for="(el, key) in error" :key="key"> {{ el.message }}</span>
                   </span>
                   <span v-else> {{ error }}</span>
-
                 </div>
 
             </div>

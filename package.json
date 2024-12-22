@@ -21,7 +21,8 @@
     "@ckeditor/ckeditor5-font": "^36.0.1",
     "@ckeditor/ckeditor5-html-support": "^36.0.1",
     "@ckeditor/ckeditor5-vue": "^4.0.1",
-    "vue-i18n": "^9.13.1"
+    "vue-i18n": "^9.13.1",
+    "v-pagination-3": "^0.1.7"
   },
   "devDependencies": {
     "@babel/core": "^7.12.16",

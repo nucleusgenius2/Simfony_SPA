@@ -32,6 +32,13 @@
                 </div>
             </div>
 
+            <div class="auth-text form-auth-false"  v-if="error !== ''">
+                    <span v-if="Array.isArray(error)">
+                          <span v-for="(el, key) in error" :key="key"> {{ el.message }}</span>
+                    </span>
+            <span v-else> {{ error }}</span>
+            </div>
+
         </div>
     </div>
 </template>
@@ -45,9 +52,11 @@ import {useRoute} from "vue-router";
 import {authRequest} from "@/api.js";
 
 
+let error =  ref('');
 const route = useRoute();
 let user = ref({
     name : '',
+    email : '',
     role : '',
 });
 let textEditor = ref('');
@@ -57,57 +66,34 @@ let saveStatus = ref('');
 //get post info
 onMounted(
     async () => {
-        if (route.params.id !== 'add') {
-            let response = await authRequest('api/users/' + route.params.id, 'get');
+      let response = await authRequest('api/users/' + route.params.id, 'get');
 
-            if ( response.data.status === 'success' ){
-                user.value = response.data.json;
-                textEditor.value = response.data.json.content;
-            }
-            else {
-                return router.put({ name: '404',  query: { textError: encodeURIComponent(response.data.text) } })
-            }
-        }
+      if ( response.data.status === 'success' ){
+        user.value = response.data.json;
+        textEditor.value = response.data.json.content;
+      }
+      else {
+        return router.put({ name: '404',  query: { textError: encodeURIComponent(response.data.text) } })
+      }
     }
 );
 
 //update post
 async function save(){
 
-    //save or update
-    let formData = new FormData();
-    formData.append('id', route.params.id)
-    formData.append('name', user.value.name)
-    formData.append('img', user.value.img)
-    formData.append('content', textEditor.value)
-    formData.append('short_description', user.value.short_description)
-    formData.append('author', JSON.parse(localStorage.getItem('token')).user);
-    formData.append('seo_title', '');
-    formData.append('seo_description', '');
-    formData.append('id_category', '');
-    //create post
-    if ( route.params.id === 'add' ){
-        let response = await authRequest('api/posts', 'post', formData);
-
-        if (response.data.status === 'success'){
-            saveStatus.value = response.data.status;
-            window.location.replace("/admin/posts/"+response.data.json);
-        }
-    }
-    //update post
-    else {
-        formData.append('_method',"PATCH") //фикс бага ларавел(форм дата не работает в пут и патч), отправляем пост, но с методом PATCH, чтобы вызвался роут патч
-        let response = await authRequest('api/posts', 'post', formData );
-        saveStatus.value = response.data.status;
+    let data = {
+      name: user.value.name,
+      email: user.value.email,
+      role: user.value.role,
     }
 
-    if ( saveStatus.value === 'success') {
-        setTimeout(() => {
-            saveStatus.value = '';
-        }, 3000);
+    let response = await authRequest('api/users', 'put', data);
+
+    if (response.data.status === 'success') {
+      error.value ='';
     }
     else {
-        console.log(saveStatus.value);
+      error.value = response.data.errors;
     }
 
 }

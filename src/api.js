@@ -9,8 +9,9 @@ export async function authRequest (path ='', type='get', data={}){
         token = JSON.parse(localStorage.getItem('token'));
     }
 
+
     let headers = {
-        Authorization: 'Bearer ' + token
+        Authorization: 'Bearer ' +  token.token
     }
 
     if (type === 'get') {
@@ -28,7 +29,7 @@ export async function authRequest (path ='', type='get', data={}){
             response = await axios.post(url, data, {
                 headers: {
                     'Content-Type' : "multipart/form-data; charset=utf-8;",
-                    Authorization: 'Bearer ' + token
+                    Authorization: 'Bearer ' +  token.token
                 }
             });
         } catch (error) {
