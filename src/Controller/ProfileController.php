@@ -32,7 +32,7 @@ class ProfileController extends AbstractController
     }
 
 
-    #[Route('/api/profile', name: 'api_profile_update', methods: ['PUT', 'PATCH', 'POST'])]
+    #[Route('/api/profile', name: 'api_profile_update', methods: ['PUT'])]
     public function update(
         Request $request,
         UserPasswordHasherInterface $passwordHasher,

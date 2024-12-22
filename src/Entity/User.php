@@ -168,8 +168,20 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function getPublicData(): ?array
     {
         return [
+            'id' => $this->id,
             'name' => $this->name,
             'email' => $this->email,
+            'created_at' => $this->created_at
+        ];
+    }
+
+    public function getFullData(): ?array
+    {
+        return [
+            'id' => $this->id,
+            'name' => $this->name,
+            'email' => $this->email,
+            'role' =>$this->getRolesStr(),
             'created_at' => $this->created_at
         ];
     }

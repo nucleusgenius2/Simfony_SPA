@@ -19,19 +19,20 @@ class PostController extends AbstractController
 {
     use ResponseController;
 
-    #[Route('/api/posts/{page}', name: 'post_list', methods: ['GET'], requirements: ['page' => '\d+'], defaults: ['page' => 1])]
+    #[Route('/api/posts', name: 'post_list', methods: ['GET'])]
     public function index(
         PostRepository $repository,
-        int $page,
         Request $request,
+        LoggerInterface $logger
     ): Response
     {
+        $page = $request->query->getInt('page', 1);
         $paginator = $repository->findPaginated($page, 10);
 
         $postData = [];
 
-        if ( count($paginator) > 0 ) {
-            foreach ($paginator as $post) {
+        if ( count($paginator['items']) > 0 ) {
+            foreach ($paginator['items'] as $post) {
                 $postData[$post->getid()] = $post->getAll();
             }
 
@@ -41,9 +42,12 @@ class PostController extends AbstractController
 
         $data = [
             'status' => $this->status,
-            'json' => $postData
+            'json' => [
+               'data' => $postData,
+                'last_page' => $paginator['totalPages'],
+                'current_page' => $paginator['currentPage'],
+            ]
         ];
-
         return new JsonResponse($data, $this->code);
     }
 

@@ -45,10 +45,14 @@ class LoginController extends AbstractController {
             }
         }
 
+        $dataUser = [
+            'token' => $token ?? 'error',
+            'user' => $user->getEmail(),
+        ];
+
         return $this->json([
             'status' => $this->status,
-            'json' => $user ?? '',
-            'token' => $token ?? 'error',
+            'json' =>  $dataUser ,
             'errors' => $this->messagesErrors
         ],  $this->code );
     }

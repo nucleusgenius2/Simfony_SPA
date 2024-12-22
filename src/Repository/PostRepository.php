@@ -25,7 +25,22 @@ class PostRepository extends ServiceEntityRepository
             ->setFirstResult(($currentPage - 1) * $limit)
             ->setMaxResults($limit);
 
-        return new Paginator($query, true);
+
+        $paginator = new Paginator($query, true);
+
+        $totalItems = count($paginator);
+
+        // Расчёт общего количества страниц
+        $totalPages = ceil($totalItems / $limit);
+
+        return [
+            'items' => iterator_to_array($paginator), // Данные текущей страницы
+            'totalPages' => $totalPages,             // Общее количество страниц
+            'currentPage' => $currentPage,           // Текущая страница
+            'totalItems' => $totalItems,             // Общее количество записей
+        ];
+
+        //return new Paginator($query, true);
     }
 
     //    /**

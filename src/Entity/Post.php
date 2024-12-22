@@ -179,7 +179,7 @@ class Post
             'content' => $this->content,
             'short_description' => $this->short_description,
             'seo_title' => $this->seo_title,
-            '$seo_description' => $this->seo_description,
+            'seo_description' => $this->seo_description,
             'img' => $this->img,
             'category_id' => $this->category_id,
             'author' => $this->author,
