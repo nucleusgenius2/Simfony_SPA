@@ -28,12 +28,32 @@ class UserRepository extends ServiceEntityRepository
 
     public function findPaginated(int $currentPage = 1, int $limit = 10)
     {
-        $query = $this->createQueryBuilder('user')
+        // Строим запрос с использованием QueryBuilder
+        $queryBuilder = $this->createQueryBuilder('user')
+            ->select('user.id, user.name, user.email, user.created_at')
             ->orderBy('user.id', 'ASC')
-            ->getQuery()
             ->setFirstResult(($currentPage - 1) * $limit)
             ->setMaxResults($limit);
 
-        return new Paginator($query, true);
+
+        $query = $queryBuilder->getQuery();
+        $query->setHydrationMode(\Doctrine\ORM\Query::HYDRATE_ARRAY);
+
+        $items = $query->getResult();
+
+        // Считаем общее количество записей (один дополнительный запрос)
+        $totalItems = $this->createQueryBuilder('user')
+            ->select('COUNT(user.id)')
+            ->getQuery()
+            ->getSingleScalarResult();
+
+        $totalPages = ceil($totalItems / $limit);
+
+        return [
+            'items' => $items,
+            'totalPages' => $totalPages,
+            'currentPage' => $currentPage,
+            'totalItems' => $totalItems,
+        ];
     }
 }

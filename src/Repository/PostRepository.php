@@ -19,52 +19,32 @@ class PostRepository extends ServiceEntityRepository
 
     public function findPaginated(int $currentPage = 1, int $limit = 10)
     {
-        $query = $this->createQueryBuilder('post')
+        $queryBuilder = $this->createQueryBuilder('post')
+            ->select('post.id, post.name, post.content, post.created_at, post.short_description, post.img')
             ->orderBy('post.id', 'ASC')
-            ->getQuery()
             ->setFirstResult(($currentPage - 1) * $limit)
             ->setMaxResults($limit);
 
 
-        $paginator = new Paginator($query, true);
+        $query = $queryBuilder->getQuery();
+        $query->setHydrationMode(\Doctrine\ORM\Query::HYDRATE_ARRAY);
 
-        $totalItems = count($paginator);
+        $items = $query->getResult();
 
-        // Расчёт общего количества страниц
+        // Считаем общее количество записей (один дополнительный запрос)
+        $totalItems = $this->createQueryBuilder('post')
+            ->select('COUNT(post.id)')
+            ->getQuery()
+            ->getSingleScalarResult();
+
         $totalPages = ceil($totalItems / $limit);
 
         return [
-            'items' => iterator_to_array($paginator), // Данные текущей страницы
-            'totalPages' => $totalPages,             // Общее количество страниц
-            'currentPage' => $currentPage,           // Текущая страница
-            'totalItems' => $totalItems,             // Общее количество записей
+            'items' => $items,
+            'totalPages' => $totalPages,
+            'currentPage' => $currentPage,
+            'totalItems' => $totalItems,
         ];
-
-        //return new Paginator($query, true);
     }
 
-    //    /**
-    //     * @return Post[] Returns an array of Post objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('p')
-    //            ->andWhere('p.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('p.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
-
-    //    public function findOneBySomeField($value): ?Post
-    //    {
-    //        return $this->createQueryBuilder('p')
-    //            ->andWhere('p.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
 }

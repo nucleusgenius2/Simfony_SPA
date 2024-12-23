@@ -29,13 +29,7 @@ class PostController extends AbstractController
         $page = $request->query->getInt('page', 1);
         $paginator = $repository->findPaginated($page, 10);
 
-        $postData = [];
-
         if ( count($paginator['items']) > 0 ) {
-            foreach ($paginator['items'] as $post) {
-                $postData[$post->getid()] = $post->getAll();
-            }
-
             $this->status = 'success';
             $this->code = 200;
         }
@@ -43,7 +37,7 @@ class PostController extends AbstractController
         $data = [
             'status' => $this->status,
             'json' => [
-               'data' => $postData,
+                'data' => $paginator['items'],
                 'last_page' => $paginator['totalPages'],
                 'current_page' => $paginator['currentPage'],
             ]

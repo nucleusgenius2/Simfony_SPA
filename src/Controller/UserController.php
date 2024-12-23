@@ -33,30 +33,22 @@ class UserController extends AbstractController
         if ( $page && intval($page > 0) ){
             $paginator = $repository->findPaginated(intval($page), 20);
 
-            $userData = [];
-
-            if (count($paginator) > 0) {
-                foreach ($paginator as $user) {
-                    $userData[$user->getid()] = [
-                        $user->getPublicData()
-                    ];
-                }
-
-                $status = 'success';
-            } else {
-                $status = 'error';
+            if (count($paginator['items']) > 0) {
+                $this->status = 'success';
+                $this->code = 200;
             }
-        }
-        else{
-            $status = 'error';
         }
 
         $data = [
-            'status' => $status,
-            'json' => $userData
+            'status' => $this->status,
+            'json' => [
+                'data' => $paginator['items'], // Уже массивы данных
+                'last_page' => $paginator['totalPages'],
+                'current_page' => $paginator['currentPage'],
+            ]
         ];
 
-        return new JsonResponse($data, $status === 'success' ? 200 : 422);
+        return new JsonResponse($data, $this->code);
     }
 
 
