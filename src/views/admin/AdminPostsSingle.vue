@@ -1,6 +1,6 @@
 <template>
-    <div className="wrap-single-news">
-        <div className="wrap-news">
+    <div class="wrap-single-news">
+        <div class="wrap-news">
 
             <div class="wrap-field">
                 <div class="heading-field">Название новости</div>
@@ -130,9 +130,9 @@ onMounted(
             let response = await authRequest('api/posts/' + route.params.id, 'get');
 
             if ( response.data.status === 'success' ){
-                array.value = response.data.json[0];
-                textEditor.value = response.data.json[0].content;
-                imgPreview.value = response.data.json[0].img;
+                array.value = response.data.json;
+                textEditor.value = response.data.json.content;
+                imgPreview.value = response.data.json.img;
             }
             else {
                 return router.put({ name: '404',  query: { textError: encodeURIComponent(response.data.text) } })

@@ -9,12 +9,12 @@
                 <div class="wrap-date">Дата регистрации</div>
             </div>
 
-            <div v-for="(users) in arrayUsers" :key="users.id">
-                <div class="post-el table-users" v-for="(user) in users" :key="user.id">
+            <div>
+                <div class="post-el table-users" v-for="(user) in  arrayUsers" :key="user.id">
                 <div><a :href="'/admin/users/'+user.id" class="post-name">{{ user.name }}</a></div>
                 <div class="user-email">{{ user.email }}</div>
                 <div class="user-status">{{ user.status }}</div>
-                <div class="wrap-date" >{{ convertTime(user.created_at.date) }}</div>
+                <div class="wrap-date" >{{ convertTime(user?.created_at?.date) }}</div>
                </div>
             </div>
 
