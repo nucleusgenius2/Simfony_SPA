@@ -1,7 +1,6 @@
 <template>
     <div class="wrap-news">
         <div class="news-list">
-            <div>Фильтр юзеров надо сделать</div>
 
             <div class="post-heading-block table-users">
                 <div class="post-name">Ник</div>
@@ -10,20 +9,16 @@
                 <div class="wrap-date">Дата регистрации</div>
             </div>
 
-            <div v-for="(users) in usersData" :key="users.id">
+            <div v-for="(users) in arrayUsers" :key="users.id">
                 <div class="post-el table-users" v-for="(user) in users" :key="user.id">
                 <div><a :href="'/admin/users/'+user.id" class="post-name">{{ user.name }}</a></div>
                 <div class="user-email">{{ user.email }}</div>
                 <div class="user-status">{{ user.status }}</div>
-                <div class="wrap-date" >{{ renderDate(user.created_at) }}</div>
+                <div class="wrap-date" >{{ convertTime(user.created_at.date) }}</div>
                </div>
             </div>
 
-            <div class="pagination-post">
-                <div class="pagination-el" v-for="(pagination) in arrayPagination" :key="pagination">
-                    <div @click="getPostsList(pagination.url)" >{{ pagination.label }}</div>
-                </div>
-            </div>
+          <pagination v-model="pageModel" :records="pageTotal" :per-page="1" @paginate="paginationListing"/>
 
         </div>
     </div>
@@ -34,23 +29,26 @@
 
 import {ref} from 'vue';
 import {authRequest} from "@/api.js";
+import Pagination from "v-pagination-3";
+import {convertTime} from "@/script/convertTime";
+let pageModel = ref(1)
+let pageTotal = ref(1)
+let arrayUsers = ref([]);
 
+async function paginationListing() {
+  let response = await authRequest('api/users?page=' + pageModel.value, 'get');
 
-let usersData = ref([]);
-let arrayPagination = ref([]);
-
-async function getPostsList (page){
-    let response = await authRequest('api/users?page='+page, 'get' );
-
-    if ( response.data.status === 'success' ){
-       usersData.value = response.data.json;
-    }
+  if (response.data.status === 'success') {
+    arrayUsers.value = response.data.json.data;
+    pageTotal.value = response.data.json.last_page;
+  }
+  else{
+    arrayUsers .value = []
+  }
 }
-getPostsList(1);
+paginationListing();
 
-function renderDate(date){
-  return new Date((date['date']).toLocaleString())
-}
+
 
 </script>
 
@@ -92,19 +90,6 @@ function renderDate(date){
 }
 
 
-.pagination-post {
-    display: flex;
-    margin-top:20px;
-}
-
-.pagination-el {
-    margin-left: 10px;
-    margin-right: 10px;
-}
-.pagination-el:first-child{
-    margin-left: 0px;
-}
-
 .post-heading-block {
     display: flex;
     width: 100%;
@@ -125,13 +110,6 @@ function renderDate(date){
     font-weight:400;
 }
 
-.remove-post {
-    padding-left: 20px;
-    text-align: right;
-    font-size: 12px;
-    color: #b50707;
-    cursor: pointer;
-}
 
 .pagination-el div {
     cursor: pointer;

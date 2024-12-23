@@ -22,7 +22,7 @@
 
             <div class="wrap-field">
                 <div class="heading-field">Дата регистрации</div>
-                <span>{{ renderDate(user.created_at) }} </span>
+                <span>{{  convertTime(user.created_at?.date) }} </span>
             </div>
 
             <div class="wrap-save">
@@ -50,6 +50,7 @@ import {onMounted, ref} from 'vue';
 import router from "@/router/router";
 import {useRoute} from "vue-router";
 import {authRequest} from "@/api.js";
+import {convertTime} from "@/script/convertTime";
 
 
 let error =  ref('');
@@ -58,6 +59,7 @@ let user = ref({
     name : '',
     email : '',
     role : '',
+
 });
 let textEditor = ref('');
 let saveStatus = ref('');
@@ -96,11 +98,6 @@ async function save(){
       error.value = response.data.errors;
     }
 
-}
-
-function renderDate(date){
-  console.log(date)
-  if( date ) {return new Date((date['date']).toLocaleString())}
 }
 
 

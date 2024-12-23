@@ -36,7 +36,6 @@ import Pagination from "v-pagination-3";
 import {convertTime} from "@/script/convertTime";
 let pageModel = ref(1)
 let pageTotal = ref(1)
-
 let arrayPosts = ref([]);
 
 async function paginationListing() {
