@@ -40,7 +40,6 @@ class ProfileController extends AbstractController
         EntityManagerInterface $entityManager,
         LoggerInterface $logger,
     ){
-       // $data = $request->request->all();
         $data = json_decode($request->getContent(), true);
         $logger->info('дата '.json_encode($data));
 
@@ -51,7 +50,6 @@ class ProfileController extends AbstractController
         }
         if (array_key_exists('name', $data) ){
             $user->setName($data['name']);
-            $logger->info('мя сменили '.$data['name']);
         }
         if (array_key_exists('password', $data) && array_key_exists('newPassword', $data)){
             if ($data['password'] === $data['newPassword']) {

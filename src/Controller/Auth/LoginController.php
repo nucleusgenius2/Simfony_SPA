@@ -38,21 +38,20 @@ class LoginController extends AbstractController {
                 } else {
                     $this->status = 'success';
                     $this->code = 200;
-                    $token = $tokenGenerator->createToken($user);
+
+                    $dataUser = [
+                        'token' => $tokenGenerator->createToken($user) ?? 'error',
+                        'user' => $user->getEmail(),
+                    ];
                 }
             } else {
                 $this->messagesErrors = 'Пользователь не найден';
             }
         }
 
-        $dataUser = [
-            'token' => $token ?? 'error',
-            'user' => $user->getEmail(),
-        ];
-
         return $this->json([
             'status' => $this->status,
-            'json' =>  $dataUser ,
+            'json' =>  $dataUser ?? [] ,
             'errors' => $this->messagesErrors
         ],  $this->code );
     }
