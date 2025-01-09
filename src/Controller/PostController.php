@@ -4,10 +4,12 @@ namespace App\Controller;
 
 
 use App\Entity\Post;
-use App\Form\PostForm;
+use App\Entity\User;
 use App\Repository\PostRepository;
 use App\Service\PutParser;
+use App\Service\ValidationError;
 use App\Traits\ResponseController;
+use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -16,6 +18,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Mime\Part\Multipart\FormDataPart;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 
 class PostController extends AbstractController
@@ -50,7 +53,7 @@ class PostController extends AbstractController
 
 
     #[Route('/api/posts/{slug}', name: 'api_post_single', methods: ['GET'])]
-    public function show(int $slug, LoggerInterface $logger, PostRepository $productRepository, Request $request): Response
+    public function show(int $slug, PostRepository $productRepository, Request $request): Response
     {
         $post = $productRepository->find($slug);
 
@@ -86,6 +89,7 @@ class PostController extends AbstractController
             $post->setContent($parsedData['content']);
             $post->setShortDescription($parsedData['short_description']);
             if ( isset($parsedData['seo_title'])) {$post->setSeoTitle($parsedData['seo_title']);}
+            if ( isset($parsedData['slug'])) {$post->setSlug($parsedData['slug']);}
             if ( isset($parsedData['seo_description'])) { $post->setSeoDescription($parsedData['seo_description']); }
             if ( isset($parsedData['category_id'])) {$post->setCategoryId($parsedData['category_id']); }
 
@@ -95,6 +99,7 @@ class PostController extends AbstractController
             $data =  [
                 'id' => $post->getId(),
                 'name' => $post->getName(),
+                'slug' => $post->getSlug(),
                 'content' => $post->getContent(),
                 'short_description' => $post->getShortDescription(),
                 'seo_title' => $post->getSeoTitle(),
@@ -108,6 +113,80 @@ class PostController extends AbstractController
         else{
             $this->status = 'error';
             $errorMessages = 'запись не найдена';
+        }
+
+        $data = [
+            'status' => $this->status,
+            'json' => [
+                'data' => $data ?? [],
+            ],
+            'text' => $errorMessages ?? ''
+        ];
+
+        return new JsonResponse($data, $this->code);
+    }
+
+
+    #[Route('/api/posts', name: 'api_post_create', methods: ['POST'])]
+    public function create(
+        PostRepository $repository,
+        Request $request,
+        LoggerInterface $logger,
+        EntityManagerInterface $entityManager,
+        PutParser $putParser,
+        ValidatorInterface $validator,
+    ): Response
+    {
+        $post = new Post();
+        $parsedData = $request->request->all();
+        $logger->info($request->getContent());
+        $logger->info(json_encode($parsedData));
+
+        $logger->info('name: ' .  $request->request->get('name'));
+
+        // Проверяем параметры запроса
+        $logger->info('Request parameters: ' . print_r($request->request->all(), true));
+
+
+
+        $post->setName($parsedData['name']);
+        $post->setContent($parsedData['content']);
+        $post->setShortDescription($parsedData['short_description']);
+        $post->setSlug($parsedData['slug']);
+        if ( isset($parsedData['seo_title'])) {$post->setSeoTitle($parsedData['seo_title']);}
+        if ( isset($parsedData['seo_description'])) { $post->setSeoDescription($parsedData['seo_description']); }
+        isset($parsedData['category_id']) ? $post->setCategoryId($parsedData['category_id']) : $post->setCategoryId(0);
+        isset($parsedData['author']) ? $post->setAuthor($parsedData['author']) : $post->setAuthor('');
+
+        $today = new DateTimeImmutable('now');
+        $post->setCreatedAt($today);
+
+        //валидация
+        $errors = $validator->validate( $post );
+        $this->messagesErrors = ValidationError::getMessageError($errors);
+
+        //валидация пройдена
+        if (!$this->messagesErrors) {
+            $entityManager->persist($post);
+            $entityManager->flush();
+
+            $this->status = 'success';
+            $this->code = 200;
+
+            $data =  [
+                'id' => $post->getId(),
+                'name' => $post->getName(),
+                'slug' => $post->getSlug(),
+                'content' => $post->getContent(),
+                'short_description' => $post->getShortDescription(),
+                'seo_title' => $post->getSeoTitle(),
+                'seo_description' => $post->getSeoDescription(),
+                'category_id' => $post->getCategoryId(),
+            ];
+        }
+        else{
+            $this->status = 'error';
+            $errorMessages = 'не удалось создать новость';
         }
 
         $data = [

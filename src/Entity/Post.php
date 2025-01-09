@@ -176,6 +176,7 @@ class Post
     {
         return [
             'name' => $this->name,
+            'slug' => $this->slug,
             'content' => $this->content,
             'short_description' => $this->short_description,
             'seo_title' => $this->seo_title,
