@@ -10,7 +10,7 @@
           <div class="post-date-c"><span>Дата создания и обновления:</span> </div>
         </div>
       </div>
-{{ arrayPosts }}
+
       <div class="post-el" v-for="(post) in arrayPosts" :key="post.id">
         <a :href="'/admin/posts/'+post.id" class="post-name">{{ post.name }}</a>
         <div class="post-author">{{ post.author }}</div>

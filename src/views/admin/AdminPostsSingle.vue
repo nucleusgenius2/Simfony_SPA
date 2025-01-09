@@ -7,6 +7,11 @@
                 <input class='field-admin' v-model="array.name">
             </div>
 
+          <div class="wrap-field">
+            <div class="heading-field">Слаг</div>
+            <input class='field-admin' v-model="array.slug">
+          </div>
+
             <div class="document-editor__toolbar"></div>
             <div class="wrap-field">
                 <div class="heading-field">Контент новости</div>
@@ -75,6 +80,7 @@ const route = useRoute();
 let array = ref({
     name : '',
     img : '',
+    slug : ''
 });
 let textEditor = ref('');
 let saveStatus = ref('');
@@ -155,19 +161,19 @@ async function save(){
     formData.append('seo_title', '');
     formData.append('seo_description', '');
     formData.append('id_category', '');
-     //create post
+    formData.append('slug', array.value.slug);
+
     if ( route.params.id === 'add' ){
-        let response = await authRequest('api/posts', 'post', formData);
+        let response = await authRequest('api/posts', 'post', formData, 'multipart/form-data');
 
         if (response.data.status === 'success'){
             saveStatus.value = response.data.status;
-            window.location.replace("/admin/posts/"+response.data.json);
+            window.location.replace("/admin/posts/"+response.data.json.data.id);
         }
     }
     //update post
     else {
-        formData.append('_method',"PATCH") //фикс бага ларавел(форм дата не работает в пут и патч), отправляем пост, но с методом PATCH, чтобы вызвался роут патч
-        let response = await authRequest('api/posts', 'post', formData );
+        let response = await authRequest('api/posts', 'put',  formData,'multipart/form-data' );
         saveStatus.value = response.data.status;
     }
 

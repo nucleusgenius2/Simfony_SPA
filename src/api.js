@@ -1,14 +1,15 @@
 import axios from "axios";
 
-export async function authRequest (path ='', type='get', data={}){
+export async function authRequest (path ='', type='get', data={}, contentType='application/json'){
 
     let url = process.env.VUE_APP_DOMAIN_BACKEND+'/'+path;
     let token = '';
     let response = 'error';
+
+
     if (localStorage.getItem("token") !== null ) {
         token = JSON.parse(localStorage.getItem('token'));
     }
-
 
     let headers = {
         Authorization: 'Bearer ' +  token.token
@@ -28,7 +29,7 @@ export async function authRequest (path ='', type='get', data={}){
         try {
             response = await axios.post(url, data, {
                 headers: {
-                    'Content-Type' : "multipart/form-data; charset=utf-8;",
+                    'Content-Type' :  contentType,
                     Authorization: 'Bearer ' +  token.token
                 }
             });
@@ -38,13 +39,12 @@ export async function authRequest (path ='', type='get', data={}){
     }
 
     if (type === 'put') {
+        console.log(contentType)
         try {
             response = await axios.put(url, data, {
                 headers: {
-                    'Cache-Control': null,
-                    'X-Requested-With': null,
-                    'Content-Type' : "application/json",
-                    Authorization: 'Bearer ' + token
+                    'Content-Type' :  contentType,
+                    Authorization: 'Bearer ' + token.token
                 }
             });
         } catch (error) {

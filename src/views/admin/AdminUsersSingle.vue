@@ -65,7 +65,6 @@ let textEditor = ref('');
 let saveStatus = ref('');
 
 
-//get post info
 onMounted(
     async () => {
       let response = await authRequest('api/users/' + route.params.id, 'get');
@@ -80,7 +79,6 @@ onMounted(
     }
 );
 
-//update post
 async function save(){
 
     let data = {
